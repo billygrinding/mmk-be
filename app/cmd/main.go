@@ -1,27 +1,53 @@
-package cmd
+package main
 
 import (
-	"flag"
-	"github.com/billygrinding/mmk-be/app/gateway"
+	"context"
+	"github.com/billygrinding/mmk-be/pb"
 	"google.golang.org/grpc/grpclog"
 	"io/ioutil"
+	"log"
+	"net"
 	"os"
+
+	"google.golang.org/grpc"
 )
 
-var serverAddress = flag.String(
-	"server-address",
-	"dns:///0.0.0.0:10000",
-	"The address to the gRPC server, in the gRPC standard naming format. "+
-		"See https://github.com/grpc/grpc/blob/master/doc/naming.md for more information.",
+const (
+	// Port for gRPC server to listen to
+	PORT = ":2000"
 )
+
+type HealthcheckServer struct {
+	pb.HealthCheckServiceServer
+}
+
+func (s *HealthcheckServer) CreateHealthCheck(ctx context.Context, in *pb.Request) (*pb.Response, error) {
+	log.Printf("Received: %v", in.GetValue())
+	response := &pb.Response{
+		Value: pb.Status_OK,
+	}
+
+	return response, nil
+
+}
 
 func main() {
-	flag.Parse()
 
-	// Adds gRPC internal logs. This is quite verbose, so adjust as desired!
-	log := grpclog.NewLoggerV2(os.Stdout, ioutil.Discard, ioutil.Discard)
-	grpclog.SetLoggerV2(log)
+	lis, err := net.Listen("tcp", PORT)
 
-	err := gateway.Run(*serverAddress)
-	log.Fatalln(err)
+	if err != nil {
+		log.Fatalf("failed connection: %v", err)
+	}
+
+	s := grpc.NewServer()
+
+	grpclog.SetLoggerV2(grpclog.NewLoggerV2(os.Stdout, ioutil.Discard, ioutil.Discard))
+	pb.RegisterHealthCheckServiceServer(s, &HealthcheckServer{})
+
+	log.Printf("Server listening at %v", lis.Addr())
+
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to server: %v", err)
+	}
+
 }
