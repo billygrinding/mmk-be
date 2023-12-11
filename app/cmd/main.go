@@ -1,35 +1,17 @@
 package main
 
 import (
-	"context"
+	service "github.com/billygrinding/mmk-be/app/healthcheck"
 	"github.com/billygrinding/mmk-be/pb"
-	"google.golang.org/grpc/grpclog"
-	"io/ioutil"
+	"google.golang.org/grpc"
 	"log"
 	"net"
-	"os"
-
-	"google.golang.org/grpc"
 )
 
 const (
 	// Port for gRPC server to listen to
 	PORT = ":2000"
 )
-
-type HealthcheckServer struct {
-	pb.HealthCheckServiceServer
-}
-
-func (s *HealthcheckServer) CreateHealthCheck(ctx context.Context, in *pb.Request) (*pb.Response, error) {
-	log.Printf("Received: %v", in.GetValue())
-	response := &pb.Response{
-		Value: pb.Status_OK,
-	}
-
-	return response, nil
-
-}
 
 func main() {
 
@@ -40,9 +22,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-
-	grpclog.SetLoggerV2(grpclog.NewLoggerV2(os.Stdout, ioutil.Discard, ioutil.Discard))
-	pb.RegisterHealthCheckServiceServer(s, &HealthcheckServer{})
+	pb.RegisterHealthCheckServiceServer(s, &service.HealthcheckServer{})
 
 	log.Printf("Server listening at %v", lis.Addr())
 
