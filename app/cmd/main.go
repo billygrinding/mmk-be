@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/billygrinding/mmk-be/app/config"
 	service "github.com/billygrinding/mmk-be/app/healthcheck"
 	"github.com/billygrinding/mmk-be/pb"
 	"google.golang.org/grpc"
@@ -8,15 +9,10 @@ import (
 	"net"
 )
 
-const (
-	// Port for gRPC server to listen to
-	PORT = ":2000"
-)
-
 func main() {
+	conf := initConfigReader()
 
-	lis, err := net.Listen("tcp", PORT)
-
+	lis, err := net.Listen("tcp", conf.App.Port)
 	if err != nil {
 		log.Fatalf("failed connection: %v", err)
 	}
@@ -30,4 +26,9 @@ func main() {
 		log.Fatalf("failed to server: %v", err)
 	}
 
+}
+
+func initConfigReader() config.Root {
+	rootConfig := config.Load(".env")
+	return rootConfig
 }

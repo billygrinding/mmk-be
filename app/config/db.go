@@ -7,11 +7,11 @@ import (
 )
 
 type Postgres struct {
-	Host     string `required:"true"`
-	Port     int    `required:"true"`
-	User     string `required:"true"`
-	Password string `required:"true"`
-	Dbname   string `envconfig:"DATABASE" required:"true"`
+	Host     string `envconfig:"POSTGRES_HOST" required:"true"`
+	Port     int    `envconfig:"POSTGRES_PORT" required:"true" default:"5432"`
+	User     string `envconfig:"POSTGRES_USER" required:"true"`
+	Password string `envconfig:"POSTGRES_PASSWORD" required:"true"`
+	Dbname   string `envconfig:"POSTGRES_DB" required:"true" default:"postgres"`
 
 	MaxConnectionLifetime          time.Duration `envconfig:"DB_MAX_CONN_LIFE_TIME" required:"true" default:"300s"`
 	MaxOpenConnection              int           `envconfig:"DB_MAX_OPEN_CONNECTION" required:"true" default:"100"`
