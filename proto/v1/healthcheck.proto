@@ -1,0 +1,23 @@
+syntax = "proto3";
+package proto.v1;
+option go_package="/pb";
+
+// HealthCheckService
+service HealthCheckService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message HealthCheckRequest {
+  string value = 1;
+}
+
+message HealthCheckResponse {
+  Status value = 1;
+}
+
+// Status
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_OK = 1;
+  STATUS_FAIL = 2;
+}
