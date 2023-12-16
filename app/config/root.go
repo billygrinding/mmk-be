@@ -39,8 +39,3 @@ func mustLoad(prefix string, spec interface{}) {
 		panic(err)
 	}
 }
-
-// mustLoad assume env vars can to satisfy spec interface rules.
-func mayLoad(prefix string, spec interface{}) {
-	_ = envconfig.Process(prefix, spec)
-}
